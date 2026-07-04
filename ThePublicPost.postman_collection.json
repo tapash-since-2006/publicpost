@@ -1,0 +1,1879 @@
+{
+  "info": {
+    "_postman_id": "the-public-post-api",
+    "name": "The Public Post API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "journalist_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "factchecker_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "articleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "journalistId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Auth",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000"
+            }
+          }
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@test.com\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/auth/register",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('admin_token', res.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/auth/login",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('token', res.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/auth/login",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register Journalist (complete-registration)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('journalist_token', res.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Reporter\",\n  \"email\": \"jane@test.com\",\n  \"password\": \"pass123\",\n  \"quizAnswers\": [1, 2, 3, 4, 5, 2],\n  \"house\": \"JOURNALIST\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/auth/complete-registration",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "complete-registration"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register Fact Checker (complete-registration)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('factchecker_token', res.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bob Checker\",\n  \"email\": \"bob@test.com\",\n  \"password\": \"pass123\",\n  \"quizAnswers\": [5, 4, 3, 2, 1, 4],\n  \"house\": \"FACT_CHECKER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/auth/complete-registration",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "complete-registration"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/auth/me",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/auth/logout",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Quiz and House",
+      "item": [
+        {
+          "name": "Submit Political Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [1, 2, 3, 4, 5, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/quiz/submit",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "quiz",
+                "submit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Select House",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"house\": \"CITIZEN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/house/select",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "house",
+                "select"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Journalist",
+      "item": [
+        {
+          "name": "Apply as Journalist (with document)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.journalist && res.journalist.id) {",
+                  "  pm.collectionVariables.set('journalistId', res.journalist.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "docTypes[]",
+                  "value": "PRESS_ID",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base}}/journalist/apply",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "journalist",
+                "apply"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Documents Separately (if apply had no docs)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "docTypes[]",
+                  "value": "PRESS_ID",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base}}/journalist/documents/upload",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "journalist",
+                "documents",
+                "upload"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Journalist Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/journalist/my/profile",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "journalist",
+                "my",
+                "profile"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Journalist Public Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/journalist/profile/{{journalistId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "journalist",
+                "profile",
+                "{{journalistId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Journalist Documents (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/journalist/{{journalistId}}/documents",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "journalist",
+                "{{journalistId}}",
+                "documents"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Admin",
+      "item": [
+        {
+          "name": "Platform Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/stats",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Journalists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/journalists/pending",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "journalists",
+                "pending"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Journalist",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/journalists/{{journalistId}}/approve",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "journalists",
+                "{{journalistId}}",
+                "approve"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Journalist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/journalists/{{journalistId}}/reject",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "journalists",
+                "{{journalistId}}",
+                "reject"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/articles/pending",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "articles",
+                "pending"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Article",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/admin/articles/{{articleId}}/approve",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "articles",
+                "{{articleId}}",
+                "approve"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Article",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Unverified claims\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/admin/articles/{{articleId}}/reject",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "articles",
+                "{{articleId}}",
+                "reject"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Request Correction",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Please add citations\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/admin/articles/{{articleId}}/correct",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "admin",
+                "articles",
+                "{{articleId}}",
+                "correct"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Articles",
+      "item": [
+        {
+          "name": "Create and Submit Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.article && res.article.id) {",
+                  "  pm.collectionVariables.set('articleId', res.article.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Breaking: Economy Update 2026",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "The economy is showing strong signs of recovery with GDP growth of 3.2 percent in Q1 2026. Experts predict continued growth throughout the year.",
+                  "type": "text"
+                },
+                {
+                  "key": "tags[]",
+                  "value": "economy",
+                  "type": "text"
+                },
+                {
+                  "key": "tags[]",
+                  "value": "politics",
+                  "type": "text"
+                },
+                {
+                  "key": "submit",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base}}/articles",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save as Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Draft Article Title",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "Draft content here...",
+                  "type": "text"
+                },
+                {
+                  "key": "submit",
+                  "value": "false",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base}}/articles",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Articles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/articles/latest?page=1&limit=10",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles",
+                "latest"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Articles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/articles/search?q=economy",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "economy"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Article by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/articles/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "My Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/articles/dashboard/me",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "articles",
+                "dashboard",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 - Fact Check",
+      "item": [
+        {
+          "name": "Get Unverified Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{factchecker_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/factcheck/unverified",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "factcheck",
+                "unverified"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Fact Check - Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{factchecker_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verdict\": \"APPROVED\",\n  \"evidence\": \"All facts verified against Reuters and AP News\",\n  \"confidence\": 0.95,\n  \"reviewNotes\": \"Clean and well sourced article\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/factcheck/article/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "factcheck",
+                "article",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Fact Check - Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{factchecker_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verdict\": \"REJECTED\",\n  \"evidence\": \"Claims could not be verified\",\n  \"confidence\": 0.3,\n  \"reviewNotes\": \"Multiple unverified claims found\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/factcheck/article/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "factcheck",
+                "article",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Article Fact Checks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/factcheck/article/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "factcheck",
+                "article",
+                "{{articleId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 - Comparison",
+      "item": [
+        {
+          "name": "Get Side-by-Side Comparison",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/compare/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "compare",
+                "{{articleId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 - Comments",
+      "item": [
+        {
+          "name": "Get Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/comments/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "comments",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great article! Very informative.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/comments/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "comments",
+                "{{articleId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9 - Rewards",
+      "item": [
+        {
+          "name": "Tip Author",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/rewards/tip/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "rewards",
+                "tip",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Article Tips",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/rewards/tips/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "rewards",
+                "tips",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Earnings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/rewards/earnings",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "rewards",
+                "earnings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Subscriptions",
+      "item": [
+        {
+          "name": "Subscribe to Journalist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tier\": \"FREE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/subscriptions/{{journalistId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{journalistId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/subscriptions",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "subscriptions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Subscription Feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/subscriptions/my/feed",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "subscriptions",
+                "my",
+                "feed"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Subscribers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/subscriptions/my/subscribers",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "subscriptions",
+                "my",
+                "subscribers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unsubscribe",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/subscriptions/{{journalistId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{journalistId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/notifications",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "notifications"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/notifications/read-all",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Specific Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\"paste-notification-id-here\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/notifications/read",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "notifications",
+                "read"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Moderation",
+      "item": [
+        {
+          "name": "Flag Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"MISLEADING\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/moderation/flag/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "flag",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Article Flags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/moderation/flags/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "flags",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Flagged Articles (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/moderation/flagged",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "flagged"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Take Down Article (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Spreading misinformation\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/moderation/takedown/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "takedown",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Restore Article (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Reviewed and cleared\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/moderation/restore/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "restore",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Warn Journalist (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Repeated policy violations\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base}}/moderation/warn/{{journalistId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "warn",
+                "{{journalistId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Moderation Log (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/moderation/log",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "moderation",
+                "log"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Credibility",
+      "item": [
+        {
+          "name": "Leaderboard (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/credibility/leaderboard",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "credibility",
+                "leaderboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Journalist Score",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/credibility/{{journalistId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "credibility",
+                "{{journalistId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Score History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/credibility/{{journalistId}}/history",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "credibility",
+                "{{journalistId}}",
+                "history"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Analytics",
+      "item": [
+        {
+          "name": "My Analytics Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/analytics/me",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "analytics",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Article Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{journalist_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/analytics/article/{{articleId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "analytics",
+                "article",
+                "{{articleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Platform Analytics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/analytics/platform",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "analytics",
+                "platform"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 - SSE",
+      "item": [
+        {
+          "name": "SSE Stream (keep open)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/sse/stream",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "sse",
+                "stream"
+              ]
+            }
+          }
+        },
+        {
+          "name": "SSE Status (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/sse/status",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "sse",
+                "status"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

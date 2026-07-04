@@ -1,0 +1,18 @@
+services:
+
+  # ─── App only — DB on Neon, Redis on Upstash ─────────────────────────────
+  app:
+    build: .
+    container_name: tpp_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    command: >
+      sh -c "
+        echo 'Syncing schema to Neon...' &&
+        npx prisma db push --accept-data-loss &&
+        echo 'Schema synced!' &&
+        node server.js
+      "

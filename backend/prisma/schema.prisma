@@ -1,0 +1,466 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* =========================
+   ENUMS
+   ========================= */
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum House {
+  CITIZEN
+  JOURNALIST
+  FACT_CHECKER
+}
+
+enum PoliticalLeaning {
+  LEFT
+  CENTER_LEFT
+  CENTER
+  CENTER_RIGHT
+  RIGHT
+}
+
+enum OAuthProvider {
+  GOOGLE
+  TWITTER
+}
+
+enum ArticleStatus {
+  DRAFT
+  UNDER_REVIEW
+  PUBLISHED
+  REJECTED
+  CORRECTED
+}
+
+enum FactCheckType {
+  AI
+  HUMAN
+}
+
+enum FactCheckStatus {
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
+enum BiasType {
+  LEFT
+  RIGHT
+  CENTER
+  NEUTRAL
+  UNKNOWN
+}
+
+enum FlagReason {
+  INCORRECT_FACT
+  MISLEADING
+  BIAS
+  HATE_SPEECH
+}
+
+enum ModerationAction {
+  WARN
+  TAKE_DOWN
+  RESTORE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+  EXPIRED
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum LedgerType {
+  TIP
+  SUBSCRIPTION
+  COMMISSION
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  PDF
+  AUDIO
+}
+
+/* =========================
+   CORE USER & AUTH
+   ========================= */
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String?  // NULL for OAuth users
+  name              String
+
+  role              Role     @default(USER)
+  house             House
+
+  politicalLeaning  PoliticalLeaning
+  lastQuizTakenAt   DateTime?
+  oauthProvider     OAuthProvider?
+  oauthId           String?
+
+  journalistProfile JournalistProfile?
+
+  comments          Comment[]
+  flags             Flag[]
+  tips              Tip[]
+  subscriptions     Subscription[] @relation("UserSubscriptions")
+  quizAttempts      QuizAttempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([oauthProvider, oauthId])
+}
+
+/* =========================
+   QUIZ HISTORY (Analytics)
+   ========================= */
+
+model QuizAttempt {
+  id     String @id @default(uuid())
+  userId String
+
+  q1 Int
+  q2 Int
+  q3 Int
+  q4 Int
+  q5 Int
+  q6 Int
+
+  totalScore        Int
+  calculatedLeaning PoliticalLeaning
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+/* =========================
+   JOURNALISTS
+   ========================= */
+
+model JournalistProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  bio              String?
+  verified         Boolean @default(false)
+  credibilityScore Float   @default(0)
+
+  user        User          @relation(fields: [userId], references: [id])
+  articles    Article[]
+  earnings    LedgerEntry[]
+  subscribers     Subscription[]
+  credibilityLogs CredibilityLog[]
+  documents       JournalistDocument[]
+
+  createdAt DateTime @default(now())
+}
+
+/* =========================
+   SUBSCRIPTIONS
+   ========================= */
+
+model Subscription {
+  id           String @id @default(uuid())
+  subscriberId String
+  journalistId String
+
+  status SubscriptionStatus @default(ACTIVE)
+  tier   SubscriptionTier   @default(FREE)
+
+  subscriber User              @relation("UserSubscriptions", fields: [subscriberId], references: [id])
+  journalist JournalistProfile @relation(fields: [journalistId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([subscriberId, journalistId])
+  @@index([journalistId, status])
+}
+
+/* =========================
+   ARTICLES
+   ========================= */
+
+model Article {
+  id      String @id @default(uuid())
+  title   String
+  content String
+
+  status ArticleStatus @default(DRAFT)
+  bias   BiasType?
+
+  authorId String
+  author   JournalistProfile @relation(fields: [authorId], references: [id])
+
+  factChecks FactCheck[]
+  comments   Comment[]
+  flags      Flag[]
+  tips       Tip[]
+  media      ArticleMedia[]
+  tags       Tag[]
+  views      ArticleView[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([authorId])
+}
+
+model Tag {
+  id   String @id @default(uuid())
+  name String @unique
+
+  articles Article[]
+}
+
+model ArticleMedia {
+  id        String @id @default(uuid())
+  articleId String
+  type      MediaType
+  url       String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([articleId])
+}
+
+/* =========================
+   FACT CHECKING
+   ========================= */
+
+model FactCheck {
+  id          String @id @default(uuid())
+  articleId   String
+
+  type        FactCheckType
+  status      FactCheckStatus
+  result      Json
+  confidence  Float?
+  reviewerId  String?
+  reviewNotes String?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([articleId, type])
+}
+
+/* =========================
+   COMMUNITY
+   ========================= */
+
+model Comment {
+  id        String @id @default(uuid())
+  content   String
+  articleId String
+  userId    String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Flag {
+  id        String     @id @default(uuid())
+  reason    FlagReason
+  articleId String
+  userId    String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, userId])
+}
+
+/* =========================
+   MONEY (LEDGER-ONLY)
+   ========================= */
+
+model LedgerEntry {
+  id           String @id @default(uuid())
+  journalistId String
+
+  amount      Float
+  type        LedgerType
+  referenceId String?
+
+  journalist JournalistProfile @relation(fields: [journalistId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Tip {
+  id        String @id @default(uuid())
+  userId    String
+  articleId String
+
+  amount Float
+
+  user    User    @relation(fields: [userId], references: [id])
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+/* =========================
+   MODERATION
+   ========================= */
+
+model ModerationLog {
+  id       String           @id @default(uuid())
+  adminId  String
+  action   ModerationAction
+  targetId String
+  reason   String?
+
+  createdAt DateTime @default(now())
+}
+
+/* =========================
+   NOTIFICATIONS
+   ========================= */
+
+enum NotificationType {
+  ARTICLE_PUBLISHED
+  ARTICLE_VERIFIED
+  ARTICLE_DISPUTED
+  ARTICLE_REJECTED
+  FACT_CHECK_SUBMITTED
+  TIP_RECEIVED
+  SUBSCRIPTION_NEW
+  MODERATION_ACTION
+  JOURNALIST_APPROVED
+  JOURNALIST_REJECTED
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  message   String
+  read      Boolean          @default(false)
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+/* =========================
+   CREDIBILITY LOG
+   ========================= */
+
+model CredibilityLog {
+  id           String @id @default(uuid())
+  journalistId String
+  delta        Float
+  reason       String
+  newScore     Float
+
+  journalist JournalistProfile @relation(fields: [journalistId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([journalistId])
+}
+
+/* =========================
+   JOURNALIST DOCUMENTS
+   ========================= */
+
+enum DocumentType {
+  PRESS_ID
+  GOVERNMENT_ID
+  EMPLOYMENT_LETTER
+  PORTFOLIO
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model JournalistDocument {
+  id           String         @id @default(uuid())
+  journalistId String
+  type         DocumentType
+  url          String
+  publicId     String
+  status       DocumentStatus @default(PENDING)
+  adminNote    String?
+
+  journalist JournalistProfile @relation(fields: [journalistId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([journalistId])
+}
+
+/* =========================
+   ARTICLE VIEWS
+   ========================= */
+
+model ArticleView {
+  id        String @id @default(uuid())
+  articleId String
+  userId    String?   // null = anonymous
+  ip        String?
+  userAgent String?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([articleId])
+  @@index([articleId, createdAt])
+}
+
+/* =========================
+   QUIZ QUESTIONS (admin configurable)
+   ========================= */
+
+model QuizQuestion {
+  id       Int    @id @default(autoincrement())
+  text     String
+  orderIdx Int    @default(0)
+  active   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
